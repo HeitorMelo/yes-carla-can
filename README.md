@@ -44,6 +44,7 @@ yes-carla-can/
 ├── vehicle_controls_module.py    # Translates keyboard input into CAN frames on vcan0
 ├── cyberattacks_module.py        # CLI entry point for injecting attack traffic onto vcan0
 ├── intrusion_detection_module.py # CLI entry point for running IDS algorithms on vcan0
+├── communication_surveillance.py # Passive CAN capture, DBC decoding, and statistics
 │
 ├── requirements.txt              # Python package dependencies
 │
@@ -551,6 +552,31 @@ You can choose a different CAN interface with `--interface`:
 ```bash
 ./collect_traffic_logs.py --duration 15 --filename can0_run.log --interface can0
 ```
+
+### Passive Python communication surveillance
+
+For a structured, read-only capture, use `communication_surveillance.py`. It
+does not transmit frames or alter the bus. It writes a CSV evidence log and a
+JSON summary grouped by arbitration ID, including inter-arrival statistics and
+optional DBC signal decoding:
+
+```bash
+python communication_surveillance.py --interface vcan0 --duration 30
+```
+
+The files are written to `traffic_logs/` by default. For a bounded test
+capture, use `--max-frames`:
+
+```bash
+python communication_surveillance.py \
+  --interface vcan0 \
+  --duration 60 \
+  --max-frames 1000 \
+  --output-dir traffic_logs \
+  --prefix baseline
+```
+
+Use `--dbc ''` to disable signal decoding while retaining raw frame capture.
 
 # Advanced usage - Customizing network messages and periods
 

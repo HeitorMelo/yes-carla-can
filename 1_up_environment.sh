@@ -63,7 +63,7 @@ fi
 
 # Start CARLA simulator in the background
 echo "Starting CARLA simulator..."
-./${CARLA_FOLDER_NAME}/CarlaUE4.sh -RenderOffScreen -quality_level=Low -nosound 2>/dev/null &
+./${CARLA_FOLDER_NAME}/CarlaUE4.sh -windowed -ResX=800 -ResY=600 -quality-level=Low -nosound &
 
 # Set up virtual CAN bus
 echo "Setting up virtual CAN bus..."
