@@ -1,0 +1,157 @@
+{
+  "format": "omnet-can-reference-vectors-v1",
+  "description": "Independent Classical CAN standard 11-bit data-frame vectors; CRC and stuffing span SOF through CRC sequence. Wire bit order is MSB first.",
+  "algorithm": {
+    "crc_polynomial": "0x4599",
+    "crc_width": 15,
+    "initial": 0,
+    "final_xor": 0,
+    "stuffing_after_five_equal_bits": true
+  },
+  "vectors": [
+    {
+      "name": "throttle_zero",
+      "can_id": 1536,
+      "dlc": 4,
+      "payload_hex": "00000000",
+      "crc15": "0x4b98",
+      "pre_crc_logical_bits": 51,
+      "stuffed_region_wire_bits": 74,
+      "stuff_bits": [
+        {
+          "after_logical_bit": 7,
+          "inserted_bit": 1
+        },
+        {
+          "after_logical_bit": 12,
+          "inserted_bit": 1
+        },
+        {
+          "after_logical_bit": 21,
+          "inserted_bit": 1
+        },
+        {
+          "after_logical_bit": 26,
+          "inserted_bit": 1
+        },
+        {
+          "after_logical_bit": 31,
+          "inserted_bit": 1
+        },
+        {
+          "after_logical_bit": 36,
+          "inserted_bit": 1
+        },
+        {
+          "after_logical_bit": 41,
+          "inserted_bit": 1
+        },
+        {
+          "after_logical_bit": 46,
+          "inserted_bit": 1
+        }
+      ]
+    },
+    {
+      "name": "brake_pattern",
+      "can_id": 1537,
+      "dlc": 4,
+      "payload_hex": "ff000000",
+      "crc15": "0x6c7e",
+      "pre_crc_logical_bits": 51,
+      "stuffed_region_wire_bits": 73,
+      "stuff_bits": [
+        {
+          "after_logical_bit": 7,
+          "inserted_bit": 1
+        },
+        {
+          "after_logical_bit": 23,
+          "inserted_bit": 0
+        },
+        {
+          "after_logical_bit": 31,
+          "inserted_bit": 1
+        },
+        {
+          "after_logical_bit": 36,
+          "inserted_bit": 1
+        },
+        {
+          "after_logical_bit": 41,
+          "inserted_bit": 1
+        },
+        {
+          "after_logical_bit": 46,
+          "inserted_bit": 1
+        },
+        {
+          "after_logical_bit": 63,
+          "inserted_bit": 0
+        }
+      ]
+    },
+    {
+      "name": "empty_max_identifier",
+      "can_id": 2047,
+      "dlc": 0,
+      "payload_hex": "",
+      "crc15": "0x272f",
+      "pre_crc_logical_bits": 19,
+      "stuffed_region_wire_bits": 37,
+      "stuff_bits": [
+        {
+          "after_logical_bit": 5,
+          "inserted_bit": 0
+        },
+        {
+          "after_logical_bit": 10,
+          "inserted_bit": 0
+        },
+        {
+          "after_logical_bit": 16,
+          "inserted_bit": 1
+        }
+      ]
+    },
+    {
+      "name": "brake_recessive_payload_bit",
+      "can_id": 1537,
+      "dlc": 4,
+      "payload_hex": "80000000",
+      "crc15": "0x777a",
+      "pre_crc_logical_bits": 51,
+      "stuffed_region_wire_bits": 73,
+      "stuff_bits": [
+        {
+          "after_logical_bit": 7,
+          "inserted_bit": 1
+        },
+        {
+          "after_logical_bit": 24,
+          "inserted_bit": 1
+        },
+        {
+          "after_logical_bit": 29,
+          "inserted_bit": 1
+        },
+        {
+          "after_logical_bit": 34,
+          "inserted_bit": 1
+        },
+        {
+          "after_logical_bit": 39,
+          "inserted_bit": 1
+        },
+        {
+          "after_logical_bit": 44,
+          "inserted_bit": 1
+        },
+        {
+          "after_logical_bit": 49,
+          "inserted_bit": 1
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,233 @@
+{
+  "schema_version": 1,
+  "dbc_file": "data/carla_multi_ecu.dbc",
+  "dbc_sha256": "d166bec19d21566fce5c40d0eb0293421a2a99452367655c607a660ceeeb8016",
+  "time_unit": "ns",
+  "bitrate": 500000,
+  "frame_format": "classical_can_standard_11bit",
+  "bus": {
+    "queue_capacity": 256
+  },
+  "nodes": {
+    "Powertrain_ECU": {
+      "queue_capacity": 32,
+      "acknowledge": true
+    },
+    "Chassis_ECU": {
+      "queue_capacity": 32,
+      "acknowledge": true
+    },
+    "ADAS_ECU": {
+      "queue_capacity": 64,
+      "acknowledge": true
+    },
+    "Body_ECU": {
+      "queue_capacity": 16,
+      "acknowledge": true
+    },
+    "ActuatorGateway": {
+      "queue_capacity": 64,
+      "acknowledge": true
+    }
+  },
+  "messages": [
+    {
+      "id": 1536,
+      "name": "THROTTLE",
+      "dlc": 4,
+      "producer": "Powertrain_ECU",
+      "cycle_ns": 100000000,
+      "signals": [
+        "THROTTLE_signal"
+      ]
+    },
+    {
+      "id": 1537,
+      "name": "BRAKE",
+      "dlc": 4,
+      "producer": "Chassis_ECU",
+      "cycle_ns": 100000000,
+      "signals": [
+        "BRAKE_signal"
+      ]
+    },
+    {
+      "id": 1538,
+      "name": "STEER",
+      "dlc": 4,
+      "producer": "Chassis_ECU",
+      "cycle_ns": 100000000,
+      "signals": [
+        "STEER_signal"
+      ]
+    },
+    {
+      "id": 1539,
+      "name": "REVERSE",
+      "dlc": 1,
+      "producer": "Powertrain_ECU",
+      "cycle_ns": 200000000,
+      "signals": [
+        "REVERSE_signal"
+      ]
+    },
+    {
+      "id": 1540,
+      "name": "HAND_BRAKE",
+      "dlc": 1,
+      "producer": "Chassis_ECU",
+      "cycle_ns": 200000000,
+      "signals": [
+        "HAND_BRAKE_signal"
+      ]
+    },
+    {
+      "id": 1541,
+      "name": "AUTOPILOT",
+      "dlc": 4,
+      "producer": "ADAS_ECU",
+      "cycle_ns": 500000000,
+      "signals": [
+        "AUTOPILOT_signal"
+      ]
+    },
+    {
+      "id": 1542,
+      "name": "MANUAL_TRANSMISSION",
+      "dlc": 1,
+      "producer": "Powertrain_ECU",
+      "cycle_ns": 500000000,
+      "signals": [
+        "MANUAL_TRANSMISSION_signal"
+      ]
+    },
+    {
+      "id": 1543,
+      "name": "GEAR",
+      "dlc": 4,
+      "producer": "Powertrain_ECU",
+      "cycle_ns": 200000000,
+      "signals": [
+        "GEAR_signal"
+      ]
+    },
+    {
+      "id": 1548,
+      "name": "DOORS",
+      "dlc": 1,
+      "producer": "Body_ECU",
+      "cycle_ns": 0,
+      "signals": [
+        "DOORS_signal"
+      ]
+    },
+    {
+      "id": 1549,
+      "name": "GENERAL_LIGHTS",
+      "dlc": 2,
+      "producer": "Body_ECU",
+      "cycle_ns": 0,
+      "signals": [
+        "LIGHTS_Position_signal",
+        "LIGHTS_LowBeam_signal",
+        "LIGHTS_HighBeam_signal",
+        "LIGHTS_Brake_signal",
+        "LIGHTS_RightBlinker_signal",
+        "LIGHTS_LeftBlinker_signal",
+        "LIGHTS_Reverse_signal",
+        "LIGHTS_Fog_signal",
+        "LIGHTS_Interior_signal",
+        "LIGHTS_Special1_signal",
+        "LIGHTS_Special2_signal"
+      ]
+    },
+    {
+      "id": 1550,
+      "name": "GNSS",
+      "dlc": 8,
+      "producer": "ADAS_ECU",
+      "cycle_ns": 1000000000,
+      "signals": [
+        "GNSS_LAT_signal",
+        "GNSS_LON_signal"
+      ]
+    },
+    {
+      "id": 1551,
+      "name": "COLLISION",
+      "dlc": 2,
+      "producer": "ADAS_ECU",
+      "cycle_ns": 0,
+      "signals": [
+        "COLLISION_INTENSITY_signal"
+      ]
+    },
+    {
+      "id": 1552,
+      "name": "LANE_INVASION",
+      "dlc": 2,
+      "producer": "ADAS_ECU",
+      "cycle_ns": 0,
+      "signals": [
+        "LANE_INVASION_TYPE_signal"
+      ]
+    },
+    {
+      "id": 1553,
+      "name": "IMU_ACCEL",
+      "dlc": 6,
+      "producer": "ADAS_ECU",
+      "cycle_ns": 100000000,
+      "signals": [
+        "IMU_ACCEL_X_signal",
+        "IMU_ACCEL_Y_signal",
+        "IMU_ACCEL_Z_signal"
+      ]
+    },
+    {
+      "id": 1554,
+      "name": "IMU_GYRO",
+      "dlc": 6,
+      "producer": "ADAS_ECU",
+      "cycle_ns": 100000000,
+      "signals": [
+        "IMU_GYRO_X_signal",
+        "IMU_GYRO_Y_signal",
+        "IMU_GYRO_Z_signal"
+      ]
+    },
+    {
+      "id": 1555,
+      "name": "IMU_COMPASS",
+      "dlc": 2,
+      "producer": "ADAS_ECU",
+      "cycle_ns": 100000000,
+      "signals": [
+        "IMU_COMPASS_signal"
+      ]
+    },
+    {
+      "id": 1556,
+      "name": "RADAR_TARGET",
+      "dlc": 8,
+      "producer": "ADAS_ECU",
+      "cycle_ns": 0,
+      "signals": [
+        "RADAR_VEL_signal",
+        "RADAR_AZI_signal",
+        "RADAR_ALT_signal",
+        "RADAR_DEPTH_signal"
+      ]
+    }
+  ],
+  "receiver_filters": {
+    "ActuatorGateway": "all_standard_data_frames"
+  },
+  "timeout_policy": {
+    "ActuatorGateway": "hold_last"
+  },
+  "attack": {
+    "enabled": false,
+    "profile": "bit_driver_demo"
+  }
+}

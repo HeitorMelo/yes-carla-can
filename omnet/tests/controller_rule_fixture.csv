@@ -1,0 +1,8 @@
+# controller,operation,count,expected_tec,expected_rec,expected_state,may_transmit
+tx,bit_error,16,128,0,error_passive,1
+tx,ack_error,1,128,0,error_passive,1
+tx,tx_success,1,127,0,error_active,1
+tx,bit_error,17,256,0,bus_off,0
+tx,blocked_request,1,256,0,bus_off,0
+rx,receive_error,128,0,128,error_passive,1
+rx,rx_success,1,0,119,error_active,1

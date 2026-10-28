@@ -2,6 +2,10 @@
 
 **Yes, CARLA CAN** is an automotive cybersecurity experimentation platform that extends the [CARLA](https://carla.org/) driving simulator with a virtual [CAN bus](https://en.wikipedia.org/wiki/CAN_bus). It lets you run attack and defense experiments against a simulated vehicle network without any dedicated hardware.
 
+## Experiment scope and safety boundary
+
+This repository is for offline, reproducible experiments in software simulators. CAN traffic is intended for the local virtual interfaces and simulated ECUs documented here. The experiments do not target real vehicles, physical CAN adapters or buses, external networks, or third-party systems. CARLA vehicle responses are simulated outcomes, not evidence of effects on a physical vehicle. Keep attack scenarios and validation inside the local simulator environment; use results to evaluate detection, resilience, and model limitations.
+
 This work was accepted for the Salão de Ferramentas of the Simpósio Brasileiro de Redes de Computadores e Sistemas Distribuídos (SBRC) 2026 and is currently under revision by the Artifact Technical Committee.
 
 ## Architecture overview
