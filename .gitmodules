@@ -1,0 +1,9 @@
+[submodule "CAN-bus-simulator"]
+	path = CAN-bus-simulator
+	url = git@github.com:Andreea777/CAN-bus-simulator.git
+[submodule "doip-sim-ecu-dsl"]
+	path = doip-sim-ecu-dsl
+	url = git@github.com:doip-sim-ecu/doip-sim-ecu-dsl.git
+[submodule "ecu-simulator"]
+	path = ecu-simulator
+	url = git@github.com:lbenthins/ecu-simulator.git

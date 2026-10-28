@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "description": "Message ownership for the CAN-bus-simulator integration.",
+  "simulator_bus": "vcan1",
+  "carla_bus": "vcan0",
+  "messages": [
+    {
+      "can_id": "0x100",
+      "name": "ENGINE_RPM",
+      "producer": "engine_ecu",
+      "consumers": ["dashboard_ecu"],
+      "carla_message": null
+    },
+    {
+      "can_id": "0x101",
+      "name": "VEHICLE_SPEED",
+      "producer": "engine_ecu",
+      "consumers": ["dashboard_ecu"],
+      "carla_message": null
+    },
+    {
+      "can_id": "0x102",
+      "name": "ENGINE_TEMP",
+      "producer": "engine_ecu",
+      "consumers": ["dashboard_ecu"],
+      "carla_message": null
+    },
+    {
+      "can_id": "0x103",
+      "name": "FUEL_LEVEL",
+      "producer": "engine_ecu",
+      "consumers": ["dashboard_ecu"],
+      "carla_message": null
+    },
+    {
+      "can_id": "0x104",
+      "name": "BRAKE_STATUS",
+      "producer": "brake_ecu",
+      "consumers": ["engine_ecu", "lighting_ecu", "dashboard_ecu"],
+      "carla_message": "BRAKE",
+      "transform": "binary_to_u8"
+    },
+    {
+      "can_id": "0x105",
+      "name": "TURN_SIGNAL",
+      "producer": "direction_ecu",
+      "consumers": ["lighting_ecu", "dashboard_ecu"],
+      "carla_message": "GENERAL_LIGHTS",
+      "transform": "turn_signal_to_lights"
+    },
+    {
+      "can_id": "0x106",
+      "name": "ACCELERATOR",
+      "producer": "brake_ecu",
+      "consumers": ["engine_ecu", "dashboard_ecu"],
+      "carla_message": "THROTTLE",
+      "transform": "binary_to_u8"
+    }
+  ]
+}
