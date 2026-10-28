@@ -63,7 +63,12 @@ fi
 
 # Start CARLA simulator in the background
 echo "Starting CARLA simulator..."
-./${CARLA_FOLDER_NAME}/CarlaUE4.sh -windowed -ResX=800 -ResY=600 -quality-level=Low -nosound &
+
+./${CARLA_FOLDER_NAME}/CarlaUE4.sh \
+  -RenderOffScreen \
+  -quality-level=Low \
+  -nosound \
+  -carla-rpc-port=2000 &
 
 # Set up virtual CAN bus
 echo "Setting up virtual CAN bus..."
