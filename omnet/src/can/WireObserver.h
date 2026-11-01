@@ -21,22 +21,35 @@ public:
             return;
         }
         if (invalid_) return;
+
         if (stuffDue_) {
-            if (bit == last_) { invalid_ = true; return; }
+            if (bit == last_) {
+                invalid_ = true;
+                return;
+            }
             last_ = bit;
             run_ = 1;
             stuffDue_ = false;
             return;
         }
-        if (logicalCount_ >= 1 && logicalCount_ <= 11)
+
+        if (logicalCount_ >= 1 && logicalCount_ <= 11) {
             id_ = static_cast<std::uint16_t>((id_ << 1) | bit);
-        if (logicalCount_ == 12 || logicalCount_ == 13 || logicalCount_ == 14)
-            if (bit) invalid_ = true; // unsupported RTR, IDE, r0
-        if (logicalCount_ >= 15 && logicalCount_ <= 18)
+        }
+        if (logicalCount_ >= 12 && logicalCount_ <= 14 && bit) {
+            invalid_ = true; // unsupported RTR, IDE, r0
+        }
+        if (logicalCount_ >= 15 && logicalCount_ <= 18) {
             dlc_ = (dlc_ << 1) | static_cast<unsigned>(bit);
+        }
         ++logicalCount_;
-        if (bit == last_) ++run_;
-        else { last_ = bit; run_ = 1; }
+
+        if (bit == last_) {
+            ++run_;
+        } else {
+            last_ = bit;
+            run_ = 1;
+        }
         if (run_ == 5) stuffDue_ = true;
     }
 
@@ -48,8 +61,14 @@ public:
     }
 
 private:
-    bool started_ = false, invalid_ = false, last_ = false, stuffDue_ = false;
-    unsigned logicalCount_ = 0, run_ = 0, dlc_ = 0;
+    bool started_ = false;
+    bool invalid_ = false;
+    bool last_ = false;
+    bool stuffDue_ = false;
+    unsigned logicalCount_ = 0;
+    unsigned run_ = 0;
+    unsigned dlc_ = 0;
     std::uint16_t id_ = 0;
 };
-}
+
+} // namespace canlab

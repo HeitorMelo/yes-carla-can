@@ -1,4 +1,5 @@
 #include "CanController.h"
+
 #include <algorithm>
 
 namespace canlab {
@@ -29,13 +30,9 @@ void CanController::transmitError(ErrorKind kind, TransmitErrorContext context) 
 
 void CanController::receiveError(ErrorKind kind, ReceiveErrorContext context) {
     if (state() == ControllerState::BusOff) return;
-    if (context.dominantFirstBitAfterErrorFlag) {
-        rec_ = std::min(255u, rec_ + 8u);
-    } else if (context.bitErrorDuringActiveErrorFlag && kind == ErrorKind::Bit) {
-        rec_ = std::min(255u, rec_ + 8u);
-    } else {
-        rec_ = std::min(255u, rec_ + 1u);
-    }
+    const bool flagError = context.dominantFirstBitAfterErrorFlag ||
+                           (context.bitErrorDuringActiveErrorFlag && kind == ErrorKind::Bit);
+    rec_ = std::min(255u, rec_ + (flagError ? 8u : 1u));
 }
 
 void CanController::successfulTransmit() {

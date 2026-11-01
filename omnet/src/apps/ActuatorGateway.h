@@ -13,6 +13,9 @@ class ActuatorGateway : public omnetpp::cSimpleModule {
     omnetpp::simtime_t lastBrakeDelivery;
     omnetpp::simtime_t freshnessTimeout;
     std::ofstream freshness;
+
+    void writeFreshness(const char *state, omnetpp::simtime_t age);
+
   protected:
     void initialize() override;
     void handleMessage(omnetpp::cMessage *message) override;

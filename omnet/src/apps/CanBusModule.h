@@ -3,12 +3,12 @@
 
 #include "../can/CanBus.h"
 #include "../can/CanController.h"
-#include <omnetpp.h>
 #include <deque>
 #include <fstream>
-#include <vector>
-#include <unordered_map>
+#include <omnetpp.h>
 #include <set>
+#include <unordered_map>
+#include <vector>
 
 namespace canlab {
 
@@ -54,29 +54,32 @@ class CanBusModule : public omnetpp::cSimpleModule {
     bool activeErrorFlag = false;
     size_t maxQueueDepth = 0;
     omnetpp::simtime_t bitDuration;
-    omnetpp::cMessage *event = nullptr;
+    omnetpp::cMessage* event = nullptr;
     std::ofstream trace;
 
     CanController& controller(const std::string& ecu);
+    bool isTransmitter(const std::string& ecu) const;
+    bool acknowledgementPresent() const;
+    std::vector<ReceiverError> sampleReceivers(bool dominant);
+    void validateSameIdContenders() const;
     void requeueHead(const PendingFrame& frame);
-    void acceptRequest(CanEvent *request);
+    void acceptRequest(CanEvent* request);
     void beginAttempt();
     void beginBit();
     void resolveBit();
     void finishFrame();
     void deliverFrame();
-    void failAttempt(const char *reason, const std::vector<size_t>& errorTransmitters = {},
-                     const char *errorField = "ErrorFlag",
+    void failAttempt(const char* reason, const std::vector<size_t>& errorTransmitters = {},
+                     const char* errorField = "ErrorFlag",
                      const std::vector<ReceiverError>& receiverErrors = {});
-    void writeTrace(const char *eventName, const char *reason, int bit = -1,
-                    const char *field = "", unsigned tecBefore = 0, unsigned recBefore = 0,
-                    const PendingFrame *frame = nullptr);
+    void writeTrace(const char* eventName, const char* reason, int bit = -1, const char* field = "",
+                    unsigned tecBefore = 0, unsigned recBefore = 0, const PendingFrame* frame = nullptr);
     void sendDelivery(int gateIndex);
-    void sendWireObservation(const char *type, bool dominant = false);
+    void sendWireObservation(const char* type, bool dominant = false);
 
   protected:
     void initialize() override;
-    void handleMessage(omnetpp::cMessage *message) override;
+    void handleMessage(omnetpp::cMessage* message) override;
     void finish() override;
 };
 
