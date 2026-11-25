@@ -177,6 +177,11 @@ pyrightconfig.json
 # Donwloaded CARLA simulator files
 carla-0-9-15/**
 carla-0-9-15.tar.gz
+carla_can_bridge/Makefile
+carla_can_bridge/carla_can_bridge
+carla_can_bridge/.cmdenv-log
+carla_can_bridge/out/
+carla_can_bridge/results/
 
 # Local simulation toolchains and experiment output
 .tools/

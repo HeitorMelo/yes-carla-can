@@ -189,6 +189,16 @@ The virtual CAN interface (`vcan0`) is entirely software-defined and isolated fr
 
 # Installation
 
+## Initial CARLA and OMNeT++ integration
+
+The optional `bridge_manager.py` sends DBC frames to FiCo4OMNeT in 20 ms CARLA steps. It samples GNSS from the map projection and acceleration, angular velocity, and heading from the selected vehicle. These motion values use CARLA actor coordinates and are not readings from an attached IMU. Received GNSS and motion frames are printed as JSON lines with `type: bus_output`, the DBC signals, and the window in which they were received. The bridge also applies received control frames to the vehicle.
+
+The supplied `opp_env` package for FiCo4OMNeT uses OMNeT++ 6.0.3. Install `pyzmq` in the CARLA Python environment and build with `./carla_can_bridge/build.sh`. Start CARLA, then start `./carla_can_bridge/run_omnet.sh NoAttack`, then run `python bridge_manager.py --max-ticks 100` in the CARLA Python environment. Omit `--max-ticks` for an unbounded run. The bridge selects an existing hero vehicle or creates one, and restores CARLA settings on exit.
+
+For this bridge's vehicle and map telemetry, CARLA can run without a graphics device using `./carla-0-9-15/CarlaUE4.sh -nullrhi -nosound -quality-level=Low`. Null rendering does not provide camera images. For camera output, start CARLA with `-RenderOffScreen -quality-level=Low` and run the bridge with `--rendering`. The bridge does not itself create a camera sensor.
+
+The CAN model uses frame-level arbitration and estimated transmission duration. ZeroMQ PUB/SUB delivery is asynchronous, so a clock acknowledgment alone does not guarantee that every frame has reached the subscriber during the same step; printed timestamps indicate the harvest window, not the exact transmission time. Collision, lane invasion and radar events are not captured by this initial bridge.
+
 Run the install script once. It will handle everything, prompting you only if Miniconda is not yet present:
 
 ```bash
