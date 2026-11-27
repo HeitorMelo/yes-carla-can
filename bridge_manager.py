@@ -11,6 +11,7 @@ from pathlib import Path
 
 import carla
 import cantools
+import pygame
 import zmq
 
 
@@ -49,6 +50,7 @@ class CarlaCanLockstepBridge:
         port: int = 2000,
         timeout: float = 30.0,
         rendering: bool = False,
+        controls_window: bool = False,
     ) -> None:
         if fixed_delta <= 0:
             raise ValueError("fixed_delta must be positive")
@@ -68,6 +70,10 @@ class CarlaCanLockstepBridge:
         self.client.set_timeout(timeout)
         self.timeout = timeout
         self.rendering = rendering
+        self.controls_window = controls_window
+        self.control_screen = None
+        self.control_font = None
+        self._controls_window_open = True
         self.world = None
         self.original_settings = None
         self.vehicle = None
@@ -136,6 +142,50 @@ class CarlaCanLockstepBridge:
         self._clock_ready = True
         # Give the PUB/SUB subscriptions time to propagate before the first frame.
         time.sleep(0.15)
+
+    def setup_controls_window(self) -> None:
+        if not self.controls_window:
+            return
+        pygame.init()
+        self.control_screen = pygame.display.set_mode((430, 260))
+        pygame.display.set_caption("Yes, CARLA CAN — Controls")
+        self.control_font = pygame.font.SysFont(None, 25)
+
+    def update_controls_window(self) -> None:
+        if not self.controls_window or self.control_screen is None:
+            return
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self._controls_window_open = False
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                self._controls_window_open = False
+
+        keys = pygame.key.get_pressed()
+        self.commands["throttle"] = 0.35 if keys[pygame.K_w] or keys[pygame.K_UP] else 0.0
+        self.commands["brake"] = 1.0 if keys[pygame.K_s] or keys[pygame.K_DOWN] else 0.0
+        self.commands["steer"] = (
+            -0.6 if keys[pygame.K_a] or keys[pygame.K_LEFT]
+            else 0.6 if keys[pygame.K_d] or keys[pygame.K_RIGHT]
+            else 0.0
+        )
+        self.commands["hand_brake"] = bool(keys[pygame.K_SPACE])
+
+        self.control_screen.fill((25, 31, 42))
+        lines = [
+            "CARLA ↔ OMNeT++ keyboard controls",
+            "W / ↑  Accelerate       S / ↓  Brake",
+            "A / ←  Steer left      D / →  Steer right",
+            "SPACE  Hand brake       ESC  Close controls",
+            "",
+            f"Throttle: {self.commands['throttle']:.2f}   Brake: {self.commands['brake']:.2f}",
+            f"Steer: {self.commands['steer']:+.2f}      Hand brake: {self.commands['hand_brake']}",
+            "Click this window before using the keys.",
+        ]
+        for index, line in enumerate(lines):
+            color = (245, 245, 245) if index == 0 else (190, 205, 225)
+            surface = self.control_font.render(line, True, color)
+            self.control_screen.blit(surface, (18, 18 + index * 28))
+        pygame.display.flip()
 
     def _signal_values(self, message) -> dict:
         values = {}
@@ -292,8 +342,10 @@ class CarlaCanLockstepBridge:
         try:
             self.setup_carla()
             self.setup_sockets()
+            self.setup_controls_window()
             tick = 0
-            while max_ticks is None or tick < max_ticks:
+            while (max_ticks is None or tick < max_ticks) and self._controls_window_open:
+                self.update_controls_window()
                 sim_time = tick * self.delta_t
                 target_time = (tick + 1) * self.delta_t
                 self._publish_due_frames(sim_time)
@@ -339,6 +391,8 @@ class CarlaCanLockstepBridge:
         for sock in (self.pub, self.sub, self.sync):
             sock.close(linger=0)
         self.context.term()
+        if self.controls_window:
+            pygame.quit()
 
 
 def parse_args() -> argparse.Namespace:
@@ -352,6 +406,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--steer", type=float, default=0.0)
     parser.add_argument("--timeout", type=float, default=30.0)
     parser.add_argument("--rendering", action="store_true", help="enable CARLA rendering for camera sensors")
+    parser.add_argument("--controls-window", action="store_true", help="open a keyboard controls window (WASD/arrows, space)")
     parser.add_argument("--max-ticks", type=int, default=None, help="stop after this many lockstep ticks")
     return parser.parse_args()
 
@@ -368,6 +423,7 @@ def main() -> None:
         port=args.port,
         timeout=args.timeout,
         rendering=args.rendering,
+        controls_window=args.controls_window,
     )
     try:
         bridge.run(max_ticks=args.max_ticks)

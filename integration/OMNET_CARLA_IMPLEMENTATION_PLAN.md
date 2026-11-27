@@ -330,3 +330,92 @@ Provisional effort for four available agents: roughly **2–4 calendar weeks for
 - [ ] Only delivered commands and explicit freshness policy determine CARLA actuation.
 - [ ] Healthy and missing-input runs have reproducible configuration and synchronized evidence.
 - [ ] Existing dependency repositories and their local edits remain untouched.
+
+## Local integration smoke-run findings (2026-11-26)
+
+The `carla-omnet-integration` branch was manually exercised on Ubuntu/Linux with
+CARLA 0.9.15, OMNeT++ 6.0.2, FiCo4OMNeT revision
+`c4e15633ee5ab66d32b86a3b8d81835c9970ac3a`, and the repository's `n4s_env`
+(Python 3.9, including `pyzmq`). A 100-tick lockstep run completed and streamed
+GNSS and IMU telemetry. A continuous run also advanced until deliberately
+stopped. This is a launch/transport smoke check, not evidence of protocol
+fidelity, deterministic replay, or a performance benchmark.
+
+### Reproduced local build and launch
+
+The checked-in `carla_can_bridge/build.sh` expects `opp_env`, Nix, OMNeT++
+6.0.3, and FiCo4OMNeT `20240124`. That environment was unavailable on the test
+machine. FiCo4OMNeT's checked-in `INSTALL` instead specifies OMNeT++ 6.0.2, so
+the bridge was built locally against the project's `.tools/omnetpp-6.0.2` and
+the FiCo4OMNeT source tree under `.tools/FiCo4OMNeT`:
+
+```bash
+source .tools/omnetpp-6.0.2/setenv -q
+git clone https://github.com/CoRE-RG/FiCo4OMNeT.git .tools/FiCo4OMNeT
+git -C .tools/FiCo4OMNeT checkout c4e15633ee5ab66d32b86a3b8d81835c9970ac3a
+cd .tools/FiCo4OMNeT
+make makefiles
+make -j4 MODE=release
+cd ../..
+```
+
+On this host, `pkg-config --cflags libzmq` returned an `-isystem` option that
+OMNeT++ 6.0.2's `opp_makemake` rejects. The successful bridge build omitted
+those unnecessary system include flags (ZeroMQ headers were in `/usr/include`):
+
+```bash
+source .tools/omnetpp-6.0.2/setenv -q
+cd carla_can_bridge
+opp_makemake -f --deep -o carla_can_bridge \
+  -I"$PWD/../.tools/FiCo4OMNeT/src" \
+  -L"$PWD/../.tools/FiCo4OMNeT/src" \
+  -lFiCo4OMNeT -lzmq
+make -j4 MODE=release
+```
+
+For a visible continuous run, start CARLA in windowed mode, start the bridge
+model with a larger simulation-time limit, then start the coordinator with
+rendering and its controls window enabled. Use separate terminals:
+
+```bash
+# Terminal 1, repository root: the startup script's default map is Town10HD_Opt.
+./carla-0-9-15/CarlaUE4.sh -windowed -ResX=1280 -ResY=720 \
+  -quality-level=Low -nosound -carla-rpc-port=2000
+
+# Terminal 2, working directory: carla_can_bridge.
+source ../.tools/omnetpp-6.0.2/setenv -q
+export LD_LIBRARY_PATH="$PWD/../.tools/FiCo4OMNeT/src${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+./carla_can_bridge -u Cmdenv \
+  -n ".:$PWD/../.tools/FiCo4OMNeT/src" -f omnetpp.ini -c NoAttack \
+  --sim-time-limit=9000000s
+
+# Terminal 3, repository root: stdout is the live bus/telemetry log.
+/home/robocin2d/miniconda3/envs/n4s_env/bin/python -u bridge_manager.py \
+  --timeout 30 --throttle 0 --brake 0 --rendering --controls-window
+```
+
+The controls window uses W/Up for throttle, S/Down for brake, A/Left and
+D/Right for steering, and Space for handbrake. The checked-in OMNeT++ config
+has a 1000-second default limit; without the command-line override it stops
+before an unbounded coordinator session. The 9,000,000-second override stays
+within OMNeT++ 6.0.2's representable simulation-time range. Close the
+coordinator cleanly first so it can send `STOP` to OMNeT++, then stop CARLA.
+
+The original `bridge_manager.py` had fixed command-line controls and no
+controls window. An optional Pygame controls window was added for this local
+integration workflow. `--rendering` is required for visible rendering; without
+it the coordinator sets CARLA's `no_rendering_mode`. The standard
+`1_up_environment.sh` SocketCAN keyboard sender is not a drop-in controller
+for this bridge because it publishes to `vcan`, while the integration routes
+frames through ZeroMQ and OMNeT++.
+
+### Remaining setup issues
+
+- Make the bridge build reproducible from a clean machine: reconcile the
+  `opp_env` OMNeT++ 6.0.3 pin with FiCo4OMNeT's OMNeT++ 6.0.2 instructions, and
+  handle `pkg-config` flags unsupported by `opp_makemake`.
+- The local smoke run used the `NoAttack` configuration. It does not validate
+  attack behavior, bit-level CAN conformance, stale-command policy, or
+  repeatability across seeds.
+- CARLA and OMNeT++ need explicit coordinated cleanup. A coordinator exit
+  sends `STOP` to OMNeT++; the CARLA process is stopped separately.
