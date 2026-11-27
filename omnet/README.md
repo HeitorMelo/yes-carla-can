@@ -67,3 +67,54 @@ python3 tools/check_omnet_config.py
 See [validation artifacts](tests/README.md) for the scope and limitations of
 these checks. Error-flag overlap and passive-only flag continuation remain
 unsupported; the latter stops the simulator with an explicit error.
+
+## CARLA integration with the Phase 1 CAN engine
+
+The `phase1_bridge.py` coordinator uses the bit-event engine through a ZeroMQ
+request/reply step protocol. Install `libzmq3-dev` and `pkg-config` to build the
+OMNeT++ executable, and install `pyzmq`, `pygame`, `carla`, and `cantools` in
+the CARLA Python environment. Set `OMNETPP_ROOT` when the local OMNeT++ 6.0.2
+installation is outside this checkout. Build with `./scripts/build_omnet.sh`.
+
+Start CARLA separately, then run `./scripts/run_phase1_cosim.sh` and, from
+another terminal, `python phase1_bridge.py --rendering --controls-window`.
+Use `--max-ticks 100` for a bounded smoke run. Focus the controls window and
+use WASD/arrows and space. The coordinator selects or creates a vehicle and,
+with `--rendering`, follows it with the spectator camera. Close the controls
+window or interrupt the coordinator to stop OMNeT++; stop CARLA separately.
+
+Each request contains all DBC frames due at the start of the 20 ms window;
+OMNeT++ simulates arbitration and bits and returns the frames accepted by the
+actuator gateway before the boundary. Frames still in flight remain in the
+engine for the next step. DBC periods are sampled on 20 ms boundaries rather
+than independently scheduled inside each window, and delivery timestamps in
+the console are harvest-window times. Motion telemetry is sampled from CARLA
+actor state, not attached sensor devices. The same model restrictions described
+above apply; this integration is not evidence of full CAN conformance. The
+legacy SocketCAN modules are not part of this launch.
+
+### Local verification and outstanding problems
+
+On 2026-11-27, a local run used CARLA 0.9.15, OMNeT++ 6.0.2 and Python 3.9.
+A 100-tick run (two simulated seconds) completed, returned GNSS and IMU frames,
+and applied a received throttle command. A second 100-tick run completed with
+rendering and the controls window enabled. A separate request carrying two CAN
+frames returned both IDs and their original payloads. The CAN core checks,
+reference vectors, manifest check and configuration check passed. These are
+smoke checks; they do not establish end-to-end determinism, timing accuracy,
+attack behavior, keyboard response under load, or full protocol conformance.
+
+- The bit-event engine retains the Phase 1 limitations documented above,
+  including unsupported overlapping error flags and passive-only continuation.
+- Periodic DBC releases are rounded to coordinator step boundaries. Returned
+  frames have window timestamps, not their precise simulated delivery times.
+  The single gateway receives valid deliveries; this setup does not model
+  per-ECU application subscriptions or event-driven CARLA sensors.
+- The current bridge blocks waiting for a request; it has no server-side idle
+  timeout or automatic recovery if its peer disappears. Start OMNeT++ before
+  the coordinator and terminate any leftover processes after a failed run.
+- CARLA reported a segmentation fault when interrupted after each local run.
+  OMNeT++ exited after the coordinator's `STOP` message. The CARLA shutdown
+  fault has not been diagnosed.
+- The OMNeT++ executable now links against ZeroMQ, including for standalone
+  configurations built with `scripts/build_omnet.sh`.

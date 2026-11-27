@@ -9,6 +9,6 @@ if [[ ! -f "${omnet_dir}/Makefile.inc" ]]; then
 fi
 source "${omnet_dir}/setenv" -q
 cd "${project_root}/omnet/src"
-opp_makemake -f --deep -u Cmdenv -o canlab
+opp_makemake -f --deep -u Cmdenv -o canlab -lzmq
 make -j"${OMNET_BUILD_JOBS:-$(nproc)}" MODE=release
 echo "Built ${project_root}/omnet/src/canlab"
