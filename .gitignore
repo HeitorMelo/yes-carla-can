@@ -177,3 +177,12 @@ pyrightconfig.json
 # Donwloaded CARLA simulator files
 carla-0-9-15/**
 carla-0-9-15.tar.gz
+
+# Local simulation toolchains and experiment output
+.tools/
+results/
+omnet/src/Makefile
+omnet/src/out/
+omnet/src/canlab
+omnet/src/**/*_m.cc
+omnet/src/**/*_m.h
